@@ -1,10 +1,18 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
 from rembg import remove
 from PIL import Image
 import io
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://emoji-maker-chi.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
@@ -12,11 +20,13 @@ def root():
 
 @app.post("/remove-bg")
 async def remove_bg(file: UploadFile = File(...)):
-    input_bytes = await file.read()
+    image_data = await file.read()
 
-    try:
-        output_bytes = remove(input_bytes)
-        return Response(content=output_bytes, media_type="image/png")
-    except Exception as e:
-        print("Error in background removal:", str(e))
-        return {"error": str(e)}
+    input_image = Image.open(io.BytesIO(image_data)).convert("RGBA")
+    output_image = remove(input_image)
+
+    output_buffer = io.BytesIO()
+    output_image.save(output_buffer, format="PNG")
+    output_buffer.seek(0)
+
+    return StreamingResponse(output_buffer, media_type="image/png")
