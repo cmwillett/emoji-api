@@ -12,7 +12,7 @@ def health_check():
 
 @app.get("/")
 def read_root():
-    return {"status": "ok"}
+    return {"message": "Emoji background removal API is running..."}
 
 @app.post("/remove-bg")
 async def remove_bg(file: UploadFile = File(...)):
