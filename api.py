@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from rembg import remove
 from PIL import Image
+from starlette.responses import StreamingResponse
 import io
 
 app = FastAPI()
