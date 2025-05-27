@@ -1,19 +1,15 @@
-# api.py
-
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from rembg import remove
-from io import BytesIO
+from fastapi import File, UploadFile
+from fastapi.responses import Response
+
 from PIL import Image
+import io
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    return {"message": "Emoji API is running."}
-
 @app.post("/remove-bg")
 async def remove_bg(file: UploadFile = File(...)):
-    input_bytes = await file.read()
-    output_bytes = remove(input_bytes)
-    return JSONResponse(content={"message": "background removed!"})
+    input_image = await file.read()
+    output_image = remove(input_image)
+    return Response(content=output_image, media_type="image/png")
