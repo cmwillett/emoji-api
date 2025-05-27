@@ -7,11 +7,7 @@ import io
 app = FastAPI()
 
 @app.get("/")
-def health_check():
-    return {"status": "ok"}
-
-@app.get("/")
-def read_root():
+def root():
     return {"message": "Emoji background removal API is running..."}
 
 @app.post("/remove-bg")
