@@ -1,23 +1,19 @@
-from flask import Flask, request, send_file
+# api.py
+
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
 from rembg import remove
+from io import BytesIO
 from PIL import Image
-import io
-import base64
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/api/remove-bg", methods=["POST"])
-def remove_bg():
-    try:
-        data = request.get_json()
-        img_data = base64.b64decode(data["image"].split(",")[1])
-        input_image = Image.open(io.BytesIO(img_data))
-        output_image = remove(input_image)
+@app.get("/")
+async def root():
+    return {"message": "Emoji API is running."}
 
-        buffer = io.BytesIO()
-        output_image.save(buffer, format="PNG")
-        buffer.seek(0)
-
-        return send_file(buffer, mimetype="image/png")
-    except Exception as e:
-        return {"error": str(e)}, 500
+@app.post("/remove-bg")
+async def remove_bg(file: UploadFile = File(...)):
+    input_bytes = await file.read()
+    output_bytes = remove(input_bytes)
+    return JSONResponse(content={"message": "background removed!"})
