@@ -12,3 +12,7 @@ async def remove_bg(file: UploadFile = File(...)):
     output_bytes = remove(input_bytes)
     
     return Response(content=output_bytes, media_type="image/png")
+
+@app.get("/")
+def read_root():
+    return {"status": "ok"}
